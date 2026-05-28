@@ -6,7 +6,6 @@ def init_db():
     cursor = db.cursor()
 
     if is_postgres():
-
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id         SERIAL PRIMARY KEY,
@@ -66,14 +65,13 @@ def init_db():
         """)
 
     else:
-        # SQLite for local dev
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                google_id TEXT UNIQUE NOT NULL,
-                email     TEXT UNIQUE NOT NULL,
-                name      TEXT,
-                role      TEXT DEFAULT 'customer',
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                google_id  TEXT UNIQUE NOT NULL,
+                email      TEXT UNIQUE NOT NULL,
+                name       TEXT,
+                role       TEXT DEFAULT 'customer',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
