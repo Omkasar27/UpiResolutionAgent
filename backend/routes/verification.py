@@ -52,10 +52,11 @@ def verify_dispute(dispute_id):
 
     # Call AI Agent
     ai_result = call_groq_agent(
-        transaction_id=transaction_id,
-        bank_status=bank_status,
-        merchant_status=merchant_status,
-        amount_debited=amount
+    transaction_id=transaction_id,
+    bank_status=bank_status,
+    merchant_status=merchant_status,
+    amount_debited=amount,
+    description=dispute.get("description", "") if isinstance(dispute, dict) else ""
     )
 
     if not ai_result["success"]:
