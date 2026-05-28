@@ -1,8 +1,9 @@
+import os
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from database import get_db
 from routes.auth_helper import admin_required
-from flask_jwt_extended import get_jwt_identity, get_jwt
+from utils.db_helper import placeholder as ph
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -36,19 +37,17 @@ def get_all_disputes():
             "ai_confidence":  d["ai_confidence"],
             "amount":         d["amount"],
             "merchant_id":    d["merchant_id"],
-            "created_at":     d["created_at"]
+            "created_at":     str(d["created_at"])
         } for d in disputes]
     })
 
 
-
-
-# Inside override_decision()
 @admin_bp.route("/admin/disputes/<int:dispute_id>/override", methods=["POST"])
 @admin_required
 def override_decision(dispute_id):
     claims = get_jwt()
     data   = request.get_json()
+    P      = ph()
 
     if not data or "action" not in data:
         return jsonify({"success": False, "error": "action is required."}), 400
@@ -67,23 +66,22 @@ def override_decision(dispute_id):
     cursor = db.cursor()
 
     dispute = cursor.execute(
-        "SELECT * FROM disputes WHERE id = ?", (dispute_id,)
+        f"SELECT * FROM disputes WHERE id = {P}", (dispute_id,)
     ).fetchone()
 
     if not dispute:
         db.close()
         return jsonify({"success": False, "error": "Dispute not found."}), 404
 
-    cursor.execute("""
+    cursor.execute(f"""
         UPDATE disputes
-        SET ai_action = ?, ai_reason = ?, status = ?
-        WHERE id = ?
+        SET ai_action = {P}, ai_reason = {P}, status = {P}
+        WHERE id = {P}
     """, (action, "Manually overridden by admin.", status_map[action], dispute_id))
 
-    # Log the override
     cursor.execute(
-        "INSERT INTO logs (dispute_id, action, performed_by, note) VALUES (?, ?, ?, ?)",
-        (dispute_id, f"OVERRIDE → {action}", claims.get("email"), f"Admin overrode to {action}.")
+        f"INSERT INTO logs (dispute_id, action, performed_by, note) VALUES ({P}, {P}, {P}, {P})",
+        (dispute_id, f"OVERRIDE - {action}", claims.get("email"), f"Admin overrode to {action}.")
     )
 
     db.commit()
@@ -99,11 +97,12 @@ def override_decision(dispute_id):
 @admin_bp.route("/admin/disputes/<int:dispute_id>/logs", methods=["GET"])
 @admin_required
 def get_dispute_logs(dispute_id):
+    P      = ph()
     db     = get_db()
     cursor = db.cursor()
 
     logs = cursor.execute(
-        "SELECT * FROM logs WHERE dispute_id = ? ORDER BY created_at ASC",
+        f"SELECT * FROM logs WHERE dispute_id = {P} ORDER BY created_at ASC",
         (dispute_id,)
     ).fetchall()
 
@@ -115,6 +114,6 @@ def get_dispute_logs(dispute_id):
             "action":       l["action"],
             "performed_by": l["performed_by"],
             "note":         l["note"],
-            "created_at":   l["created_at"]
+            "created_at":   str(l["created_at"])
         } for l in logs]
     })

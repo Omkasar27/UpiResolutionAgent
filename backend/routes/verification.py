@@ -1,49 +1,54 @@
+import os
 from flask import Blueprint, jsonify
+from flask_jwt_extended import get_jwt_identity, get_jwt
 from database import get_db
 from services.mock_bank import get_transaction_from_bank
 from services.mock_merchant import get_merchant_status
 from services.ai_agent import call_groq_agent
+from routes.auth_helper import jwt_required_custom
+from utils.db_helper import placeholder as ph
 
 verification_bp = Blueprint("verification", __name__)
 
-
 @verification_bp.route("/disputes/<int:dispute_id>/verify", methods=["POST"])
+@jwt_required_custom
 def verify_dispute(dispute_id):
-    """
-    Triggers AI verification for a dispute.
-    - Fetches bank + merchant data
-    - Calls Groq AI agent
-    - Updates dispute status
-    - Triggers refund if AI says REFUND
-    """
-    db = get_db()
+    user_id = get_jwt_identity()
+    claims  = get_jwt()
+    role    = claims.get("role")
+    P       = ph()
+
+    db     = get_db()
     cursor = db.cursor()
 
-    # Fetch dispute
     dispute = cursor.execute(
-        "SELECT * FROM disputes WHERE id = ?", (dispute_id,)
+        f"SELECT * FROM disputes WHERE id = {P}", (dispute_id,)
     ).fetchone()
 
     if not dispute:
         db.close()
         return jsonify({"success": False, "error": "Dispute not found."}), 404
 
+    dispute = dict(dispute)
+
+    if role != "admin" and str(dispute["user_id"]) != str(user_id):
+        db.close()
+        return jsonify({"success": False, "error": "Access denied."}), 403
+
     if dispute["status"] != "OPEN":
         db.close()
         return jsonify({
             "success": False,
-            "error": f"Dispute is already {dispute['status']}. Cannot re-verify."
+            "error":   f"Dispute is already {dispute['status']}."
         }), 400
 
-    transaction_id = dispute["transaction_id"]
+    transaction_id  = dispute["transaction_id"]
+    bank_data       = get_transaction_from_bank(transaction_id)
+    merchant_data   = get_merchant_status(transaction_id)
 
-    # Fetch bank + merchant data
-    bank_data = get_transaction_from_bank(transaction_id)
-    merchant_data = get_merchant_status(transaction_id)
-
-    bank_status = bank_data.get("bank_status", "UNKNOWN")
+    bank_status     = bank_data.get("bank_status", "UNKNOWN")
     merchant_status = merchant_data.get("merchant_status", "UNKNOWN")
-    amount = bank_data.get("amount", 0.0)
+    amount          = bank_data.get("amount", 0.0)
 
     # Call AI Agent
     ai_result = call_groq_agent(
@@ -55,13 +60,16 @@ def verify_dispute(dispute_id):
 
     if not ai_result["success"]:
         db.close()
-        return jsonify({"success": False, "error": ai_result["error"]}), 500
+        return jsonify({
+            "success": False,
+            "error":   "AI agent failed. Please try again.",
+            "detail":  ai_result.get("error")
+        }), 500
 
     ai_action     = ai_result["action"]
     ai_reason     = ai_result["reason"]
     ai_confidence = ai_result["confidence"]
 
-    # Map AI action to dispute status
     status_map = {
         "REFUND":   "RESOLVED",
         "WAIT":     "PENDING",
@@ -69,38 +77,57 @@ def verify_dispute(dispute_id):
     }
     new_status = status_map.get(ai_action, "PENDING")
 
-    # Update dispute in DB
-    cursor.execute("""
+    # Update dispute
+    cursor.execute(f"""
         UPDATE disputes
-        SET status = ?, ai_action = ?, ai_reason = ?, ai_confidence = ?
-        WHERE id = ?
+        SET status = {P}, ai_action = {P}, ai_reason = {P}, ai_confidence = {P}
+        WHERE id = {P}
     """, (new_status, ai_action, ai_reason, ai_confidence, dispute_id))
 
-    # If REFUND — create a refund record
+    # Log AI decision
+    cursor.execute(
+        f"INSERT INTO logs (dispute_id, action, performed_by, note) VALUES ({P}, {P}, {P}, {P})",
+        (dispute_id, f"AI - {ai_action}", "AI Agent", ai_reason)
+    )
+
+    # Create refund if needed
     refund_info = None
     if ai_action == "REFUND":
-        cursor.execute("""
+        cursor.execute(f"""
             INSERT INTO refunds (transaction_id, dispute_id, amount, status)
-            VALUES (?, ?, ?, ?)
+            VALUES ({P}, {P}, {P}, {P})
         """, (transaction_id, dispute_id, amount, "INITIATED"))
 
-        refund_id = cursor.lastrowid
+        # Get refund id
+        if os.getenv("DATABASE_URL"):
+            refund_id = cursor.execute(
+                "SELECT id FROM refunds WHERE dispute_id = %s ORDER BY created_at DESC LIMIT 1",
+                (dispute_id,)
+            ).fetchone()["id"]
+        else:
+            refund_id = cursor.lastrowid
+
         refund_info = {
             "refund_id": refund_id,
-            "amount": amount,
-            "status": "INITIATED"
+            "amount":    amount,
+            "status":    "INITIATED"
         }
+
+        cursor.execute(
+            f"INSERT INTO logs (dispute_id, action, performed_by, note) VALUES ({P}, {P}, {P}, {P})",
+            (dispute_id, "REFUND INITIATED", "System", f"Refund of {amount} initiated.")
+        )
 
     db.commit()
     db.close()
 
     return jsonify({
-        "success": True,
-        "dispute_id": dispute_id,
+        "success":        True,
+        "dispute_id":     dispute_id,
         "transaction_id": transaction_id,
-        "ai_action": ai_action,
-        "ai_reason": ai_reason,
-        "ai_confidence": ai_confidence,
+        "ai_action":      ai_action,
+        "ai_reason":      ai_reason,
+        "ai_confidence":  ai_confidence,
         "dispute_status": new_status,
-        "refund": refund_info
+        "refund":         refund_info
     })
