@@ -14,15 +14,37 @@ function AuthPage() {
     const name   = params.get("name")
     const error  = params.get("error")
 
-    if (error || !token) {
+    console.log("Auth params:", { token: !!token, role, name, error })
+
+    if (error) {
+      console.error("Auth error:", error)
       navigate("/login")
       return
     }
 
+    if (!token) {
+      console.error("No token found in URL")
+      navigate("/login")
+      return
+    }
+
+    if (!role || !name) {
+      console.error("Missing role or name:", { role, name })
+      navigate("/login")
+      return
+    }
+
+    // Save to context
     login(token, { name, role })
+
+    // Redirect based on role
+    const destination = role === "admin" ? "/admin" : "/customer"
+    console.log("Redirecting to:", destination)
+
     setTimeout(() => {
-      navigate(role === "admin" ? "/admin" : "/customer")
+      navigate(destination, { replace: true })
     }, 800)
+
   }, [])
 
   return (
@@ -33,7 +55,6 @@ function AuthPage() {
         transition={{ duration: 0.3 }}
         className="text-center"
       >
-        {/* Logo */}
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -43,10 +64,8 @@ function AuthPage() {
           <span className="text-white text-sm font-bold">U</span>
         </motion.div>
 
-        {/* Spinner */}
         <div className="w-5 h-5 border-2 border-slate-800 border-t-indigo-500 rounded-full animate-spin mx-auto mb-5" />
 
-        {/* Text */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -60,10 +79,7 @@ function AuthPage() {
           </p>
         </motion.div>
 
-        {/* Progress bar */}
-        <motion.div
-          className="mt-8 w-48 h-px bg-slate-800 rounded-full mx-auto overflow-hidden"
-        >
+        <motion.div className="mt-8 w-48 h-px bg-slate-800 rounded-full mx-auto overflow-hidden">
           <motion.div
             className="h-px bg-indigo-500 rounded-full"
             initial={{ width: "0%" }}
