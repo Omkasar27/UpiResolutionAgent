@@ -11,10 +11,10 @@ function LoginPage() {
     if (user) navigate(user.role === "admin" ? "/admin" : "/customer")
   }, [user])
 
-  const handleLogin = () => {
-    window.location.href = "http://127.0.0.1:5000/auth/login"
-  }
-
+ const handleLogin = () => {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000"
+  window.location.href = `${apiUrl}/auth/login`
+}
   return (
     <div className="min-h-screen bg-slate-950 flex">
 
