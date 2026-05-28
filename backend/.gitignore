@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+dispute_agent.db
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
