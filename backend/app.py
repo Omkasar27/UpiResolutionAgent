@@ -41,6 +41,17 @@ app.register_blueprint(admin_bp)
 def home():
     return {"message": "UPI Dispute Resolution Agent is running!"}
 
+@app.route("/debug")
+def debug():
+    import os
+    db_url = os.getenv("DATABASE_URL")
+    return {
+        "DATABASE_URL_SET": bool(db_url),
+        "DATABASE_URL_PREFIX": db_url[:20] if db_url else None,
+        "FRONTEND_URL": os.getenv("FRONTEND_URL"),
+        "GROQ_KEY_SET": bool(os.getenv("GROQ_API_KEY"))
+    }
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
