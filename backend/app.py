@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from werkzeug.middleware.proxy_fix import ProxyFix
 from models import init_db
 from config import JWT_SECRET_KEY
 from routes.disputes import disputes_bp
@@ -11,14 +12,16 @@ from routes.auth import auth_bp, init_oauth
 
 app = Flask(__name__)
 
-# Allow both local and production frontend
+# Fix https behind Render proxy
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 CORS(app,
-  supports_credentials=True,
-  origins=[
-    "http://localhost:5173",
-    "http://localhost:5174",
-    os.getenv("FRONTEND_URL", "")
-  ]
+    supports_credentials=True,
+    origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        os.getenv("FRONTEND_URL", "")
+    ]
 )
 
 app.config["JWT_SECRET_KEY"]           = JWT_SECRET_KEY

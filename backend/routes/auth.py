@@ -23,11 +23,11 @@ def get_frontend_url():
     return os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 def get_redirect_uri():
-    """Builds callback URL from current request host."""
-    # On Render, use the render URL not localhost
+    """Force https for production on Render."""
     host = request.host_url.rstrip("/")
+    if "onrender.com" in host:
+        host = host.replace("http://", "https://")
     return f"{host}/auth/callback"
-
 
 @auth_bp.route("/auth/login")
 def login():
