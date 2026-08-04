@@ -1,5 +1,102 @@
 @import "tailwindcss";
 
+/*
+  ── Theme: "Ledger & Seal" ──────────────────────────────────
+  A UPI dispute is, at its core, a receipt dispute: a paper trail,
+  a reference number, a stamp of resolution. The palette borrows
+  from that world — deep ledger-ink navy, with a brass seal-gold
+  used the way an official stamp would be: sparingly, for the
+  moment something is confirmed or approved.
+
+  These variables override Tailwind's built-in slate / indigo /
+  emerald / amber / red scales, so every existing `bg-slate-900`,
+  `text-indigo-400`, `border-emerald-500` class already in the
+  codebase repaints automatically — no component markup changes.
+*/
+@theme {
+  /* Ink — replaces slate. Structural: backgrounds, borders, body text. */
+  --color-slate-50:  #F5F5FA;
+  --color-slate-100: #E9EAF3;
+  --color-slate-200: #CDD0E4;
+  --color-slate-300: #A6AAC9;
+  --color-slate-400: #7F84AC;
+  --color-slate-500: #5F6590;
+  --color-slate-600: #484D74;
+  --color-slate-700: #363A59;
+  --color-slate-800: #232640;
+  --color-slate-900: #14162A;
+  --color-slate-950: #0A0B16;
+
+  /* Seal Gold — replaces indigo. Brand accent, CTAs, focus, links. */
+  --color-indigo-50:  #FBF3E3;
+  --color-indigo-100: #F6E4C4;
+  --color-indigo-200: #EDCB8E;
+  --color-indigo-300: #E6C480;
+  --color-indigo-400: #E0B563;
+  --color-indigo-500: #C99331;
+  --color-indigo-600: #8F6A1C;
+  --color-indigo-700: #6E5215;
+  --color-indigo-800: #4D3910;
+  --color-indigo-900: #2E220A;
+  --color-indigo-950: #1A1306;
+
+  /* Jade — replaces emerald. Resolved / refund / positive signal. */
+  --color-emerald-50:  #E9FBF3;
+  --color-emerald-100: #CFF6E4;
+  --color-emerald-200: #9FEBC9;
+  --color-emerald-300: #6FDCAE;
+  --color-emerald-400: #4FBE93;
+  --color-emerald-500: #34A57A;
+  --color-emerald-600: #238363;
+  --color-emerald-700: #1B654C;
+  --color-emerald-800: #144A38;
+  --color-emerald-900: #0D3226;
+  --color-emerald-950: #071C15;
+
+  /* Marigold — replaces amber. Pending / in-review signal. */
+  --color-amber-50:  #FDF1E4;
+  --color-amber-100: #FBE1C4;
+  --color-amber-200: #F6C595;
+  --color-amber-300: #F3B67D;
+  --color-amber-400: #F0A868;
+  --color-amber-500: #E08A3F;
+  --color-amber-600: #C06B26;
+  --color-amber-700: #98511C;
+  --color-amber-800: #6E3A15;
+  --color-amber-900: #48250D;
+  --color-amber-950: #2A1608;
+
+  /* Rust — replaces red. Escalated / rejected / danger signal. */
+  --color-red-50:  #FCEEEC;
+  --color-red-100: #F8D9D4;
+  --color-red-200: #EFAFA5;
+  --color-red-300: #E68F80;
+  --color-red-400: #E17164;
+  --color-red-500: #C5564C;
+  --color-red-600: #A43F37;
+  --color-red-700: #7D2F2A;
+  --color-red-800: #57211E;
+  --color-red-900: #361513;
+  --color-red-950: #1F0C0B;
+
+  /* Type system: Instrument Sans for display, Public Sans for body,
+     IBM Plex Mono for ledger data (amounts, refs, timestamps, IDs). */
+  --font-sans:    "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+/* Headings carry the display face; everything else stays on Public Sans. */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01" 1;
+}
+
+/* Ledger data reads with tabular figures so amounts/columns align. */
+.font-mono {
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
 *,
 *::before,
 *::after {
@@ -9,20 +106,49 @@
 
 /* Selection */
 ::selection {
-  background-color: rgba(99, 102, 241, 0.3);
+  background-color: rgba(201, 147, 49, 0.35);
   color: white;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar         { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track   { background: transparent; }
-::-webkit-scrollbar-thumb   { background: #1e293b; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #334155; }
+::-webkit-scrollbar-thumb   { background: #363A59; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #484D74; }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline: 2px solid rgba(201, 147, 49, 0.65);
   outline-offset: 2px;
+}
+
+/* ── Signature: perforated receipt edge ──────────────────────
+   A row of die-cut holes, the way a payment slip tears from its
+   pad. Used sparingly, at section boundaries, to keep the "this
+   is a receipt" idea legible in the structure, not just the copy. */
+.receipt-edge {
+  position: relative;
+  border-bottom: none;
+}
+.receipt-edge::after {
+  content: "";
+  display: block;
+  height: 9px;
+  width: 100%;
+  background-image: radial-gradient(circle, var(--color-slate-950) 3.5px, transparent 3.6px);
+  background-size: 18px 9px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+.receipt-edge-top::before {
+  content: "";
+  display: block;
+  height: 9px;
+  width: 100%;
+  background-image: radial-gradient(circle, var(--color-slate-950) 3.5px, transparent 3.6px);
+  background-size: 18px 9px;
+  background-repeat: repeat-x;
+  background-position: center;
 }
 
 /* Animations */
