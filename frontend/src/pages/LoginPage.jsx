@@ -2,6 +2,7 @@ import { useAuth } from "../context/AuthContext"
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import { SiteNavbar } from "../components/SiteNavbar"
 
 function LoginPage() {
   const { user } = useAuth()
@@ -11,88 +12,31 @@ function LoginPage() {
     if (user) navigate(user.role === "admin" ? "/admin" : "/customer")
   }, [user])
 
- const handleLogin = () => {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000"
-  window.location.href = `${apiUrl}/auth/login`
-}
+  const handleLogin = () => {
+    window.location.href = "http://127.0.0.1:5000/auth/login"
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 flex">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-8 pt-20 pb-8 relative overflow-hidden">
+      <SiteNavbar />
 
-      {/* ── Left panel ── */}
-      <motion.div
-        initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4 }}
-        className="hidden lg:flex w-1/2 flex-col justify-between p-12 border-r border-slate-800"
-      >
-        {/* Logo */}
-        <a href="/" className="flex items-center gap-2.5">
-          <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center">
-            <span className="text-white text-xs font-bold">U</span>
-          </div>
-          <span className="text-sm font-semibold text-white tracking-tight">
-            UPI Dispute
-          </span>
-        </a>
+      {/* Ambient glow */}
+      <div className="absolute inset-0 -z-10 pointer-events-none motion-reduce:hidden" aria-hidden="true">
+        <motion.div
+          className="absolute left-1/2 top-1/3 w-[560px] h-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/[0.10] blur-[130px]"
+          animate={{ opacity: [0.5, 0.8, 0.5], scale: [1, 1.06, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
 
-        {/* Content */}
-        <div className="max-w-sm">
-          <p className="text-xs font-mono text-slate-600 tracking-widest uppercase mb-6">
-            // Platform
-          </p>
-          <h2 className="text-3xl font-semibold text-white tracking-tight leading-snug mb-4">
-            AI-powered dispute resolution for UPI transactions.
-          </h2>
-          <p className="text-slate-500 text-sm leading-relaxed mb-10">
-            A structured mediation layer between customers, merchants,
-            and banks. Every dispute is verified and resolved automatically.
-          </p>
-
-          {/* Feature list */}
-          <div className="space-y-3">
-            {[
-              "Dual-source bank and merchant verification",
-              "AI decision with confidence scoring",
-              "Full audit trail and admin override",
-              "JWT-secured role-based access",
-            ].map((item, i) => (
-              <motion.div
-                key={item}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 + i * 0.07 }}
-                className="flex items-start gap-3"
-              >
-                <div className="w-4 h-4 border border-slate-700 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full" />
-                </div>
-                <p className="text-sm text-slate-400">{item}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        <p className="text-xs text-slate-700 font-mono">v1.0.0 — 2026</p>
-      </motion.div>
-
-      {/* ── Right panel ── */}
+      {/* ── Sign-in card ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
-        className="flex-1 flex items-center justify-center p-8"
+        className="w-full max-w-sm"
       >
-        <div className="w-full max-w-sm">
-
-          {/* Mobile logo */}
-          <a href="/" className="flex lg:hidden items-center gap-2.5 mb-12">
-            <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center">
-              <span className="text-white text-xs font-bold">U</span>
-            </div>
-            <span className="text-sm font-semibold text-white">UPI Dispute</span>
-          </a>
-
-          {/* Header */}
+        <div>
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -181,15 +125,6 @@ function LoginPage() {
             ))}
           </motion.div>
 
-          {/* Back */}
-          <p className="text-center mt-8">
-            <a
-              href="/"
-              className="text-xs text-slate-700 hover:text-slate-400 transition-colors"
-            >
-              Back to homepage
-            </a>
-          </p>
         </div>
       </motion.div>
     </div>

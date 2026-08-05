@@ -2,10 +2,8 @@ import { useAuth } from "../context/AuthContext"
 import { useLocation } from "react-router-dom"
 
 const PAGE_TITLES = {
-  "/customer":         { title: "Raise Dispute",  sub: "Submit a new UPI transaction dispute" },
-  "/customer/history": { title: "My Disputes",    sub: "Track the status of your disputes"    },
-  "/admin":            { title: "Overview",        sub: "Platform summary and activity"        },
-  "/admin/disputes":   { title: "All Disputes",   sub: "Manage and resolve disputes"          },
+  "/customer": { title: "Dashboard", sub: "Raise a dispute and track its status" },
+  "/admin":    { title: "Dashboard", sub: "Platform summary and dispute management" },
 }
 
 function Navbar({ onMenuClick }) {

@@ -6,18 +6,20 @@ export function Input({ label, hint, error, className = "", ...props }) {
           {label}
         </label>
       )}
-      <input
-        className={`
-          w-full h-9 px-3
-          bg-slate-800/50 border border-slate-700 rounded-lg
-          text-sm text-white placeholder-slate-600
-          focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
-          transition-all duration-150
-          ${error ? "border-red-500/50" : ""}
-          ${className}
-        `}
-        {...props}
-      />
+      <div className="shine-border">
+        <input
+          className={`
+            w-full h-9 px-3
+            bg-slate-800/50 border border-slate-700 rounded-lg
+            text-sm text-white placeholder-slate-600
+            focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
+            transition-all duration-150
+            ${error ? "border-red-500/50" : ""}
+            ${className}
+          `}
+          {...props}
+        />
+      </div>
       {hint && !error && (
         <p className="text-xs text-slate-600 font-mono">{hint}</p>
       )}

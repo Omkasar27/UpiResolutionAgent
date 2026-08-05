@@ -1,0 +1,17 @@
+export const parallaxProducts = [
+  { title: "Raise a Dispute",    link: "/login", thumbnail: "/parallax/card-1.svg" },
+  { title: "AI Verdict Engine",  link: "/login", thumbnail: "/parallax/card-2.svg" },
+  { title: "3-Way Verification", link: "/login", thumbnail: "/parallax/card-3.svg" },
+  { title: "Instant Resolution", link: "/login", thumbnail: "/parallax/card-4.svg" },
+  { title: "Admin Overview",     link: "/login", thumbnail: "/parallax/card-5.svg" },
+  { title: "All Disputes",       link: "/login", thumbnail: "/parallax/card-6.svg" },
+  { title: "Refund Issued",      link: "/login", thumbnail: "/parallax/card-7.svg" },
+  { title: "Escalation Flow",    link: "/login", thumbnail: "/parallax/card-8.svg" },
+  { title: "Google Sign-In",     link: "/login", thumbnail: "/parallax/card-9.svg" },
+  { title: "JWT Sessions",       link: "/login", thumbnail: "/parallax/card-10.svg" },
+  { title: "99% Uptime SLA",     link: "/login", thumbnail: "/parallax/card-11.svg" },
+  { title: "Command Palette",    link: "/login", thumbnail: "/parallax/card-12.svg" },
+  { title: "Audit Trail",        link: "/login", thumbnail: "/parallax/card-13.svg" },
+  { title: "Real-Time Status",   link: "/login", thumbnail: "/parallax/card-14.svg" },
+  { title: "Fair Resolution",    link: "/login", thumbnail: "/parallax/card-15.svg" },
+]

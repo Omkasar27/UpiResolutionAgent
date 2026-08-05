@@ -1,4 +1,5 @@
 import { motion } from "framer-motion"
+import { NumberTicker } from "./NumberTicker"
 
 export function StatCard({
   label,
@@ -28,7 +29,7 @@ export function StatCard({
         <p className={`text-2xl font-semibold font-mono ${
           active ? "text-white" : "text-white"
         }`}>
-          {value}
+          <NumberTicker value={value} delay={150 + index * 50} />
         </p>
         {trend !== null && (
           <span className={`text-xs font-mono mt-1 ${

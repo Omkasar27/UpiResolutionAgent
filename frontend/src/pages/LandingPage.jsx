@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
-
-const NAV_LINKS = [
-  { label: "Features",     href: "#features" },
-  { label: "How it works", href: "#how"      },
-  { label: "Security",     href: "#security" },
-]
+import { NumberTicker } from "../components/ui/NumberTicker"
+import { LampContainer } from "../components/ui/lamp"
+import { HeroParallax } from "../components/ui/hero-parallax"
+import { parallaxProducts } from "../data/parallaxProducts"
+import { SiteNavbar } from "../components/SiteNavbar"
 
 const FEATURES = [
   {
@@ -60,7 +59,7 @@ const HOW_IT_WORKS = [
 
 const STATS = [
   { value: "< 5s",  label: "Resolution time" },
-  { value: "99%",   label: "Uptime SLA"      },
+  { value: "99%",   label: "Uptime SLA",     numeric: 99, suffix: "%" },
   { value: "3-way", label: "Verification"    },
   { value: "JWT",   label: "Auth standard"   },
 ]
@@ -86,63 +85,25 @@ function LandingPage() {
     <div className="min-h-screen bg-slate-950 text-white">
 
       {/* ── Navbar ── */}
-      {/* ── Navbar ── */}
-<motion.header
-  initial={{ opacity: 0, y: -8 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.3 }}
-  className="fixed top-0 left-0 right-0 z-50 border-b border-slate-800 bg-slate-950/90 backdrop-blur-md"
->
-  <div className="max-w-6xl mx-auto px-6 h-12 grid grid-cols-3 items-center">
-
-    {/* Left — Logo */}
-    <a href="/" className="flex items-center gap-2">
-      <div className="w-5 h-5 bg-indigo-600 rounded flex items-center justify-center flex-shrink-0">
-        <span className="text-white text-[10px] font-bold">U</span>
-      </div>
-      <span className="text-sm font-semibold text-white tracking-tight">
-        UPI Dispute
-      </span>
-    </a>
-
-    {/* Center — Nav links */}
-    <nav className="hidden md:flex items-center justify-center gap-7">
-      {NAV_LINKS.map(l => (
-        <a
-          key={l.label}
-          href={l.href}
-          className="text-sm text-slate-400 hover:text-white transition-colors duration-150"
-        >
-          {l.label}
-        </a>
-      ))}
-    </nav>
-
-    {/* Right — CTA */}
-    <div className="flex items-center justify-end gap-4">
-      <button
-        onClick={() => navigate("/login")}
-        className="text-sm text-slate-500 hover:text-white transition-colors duration-150"
-      >
-        Sign in
-      </button>
-      <motion.button
-        onClick={() => navigate("/login")}
-        whileHover={{ y: -1 }}
-        whileTap={{ scale: 0.97 }}
-        className="h-8 px-4 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors duration-150 shadow-lg shadow-indigo-500/20"
-      >
-        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-        </svg>
-        Get started
-      </motion.button>
-    </div>
-  </div>
-</motion.header>
+      <SiteNavbar />
 
       {/* ── Hero ── */}
-      <section className="pt-40 pb-32 px-6">
+      <section className="relative pt-40 pb-32 px-6 overflow-hidden">
+
+        {/* Ambient glow — a resolution seal warming up behind the headline */}
+        <div className="absolute inset-0 -z-10 pointer-events-none motion-reduce:hidden" aria-hidden="true">
+          <motion.div
+            className="absolute left-1/2 top-0 w-[640px] h-[640px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-indigo-600/[0.14] blur-[130px]"
+            animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
+            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute right-[15%] top-32 w-[360px] h-[360px] rounded-full bg-emerald-500/[0.06] blur-[110px]"
+            animate={{ opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+          />
+        </div>
+
         <div className="max-w-4xl mx-auto">
 
           {/* Label */}
@@ -220,7 +181,10 @@ function LandingPage() {
                 transition={{ delay: 0.4 + i * 0.07 }}
               >
                 <p className="text-2xl font-semibold text-white font-mono">
-                  {s.value}
+                  {s.numeric != null
+                    ? <NumberTicker value={s.numeric} suffix={s.suffix} delay={400 + i * 70} />
+                    : s.value
+                  }
                 </p>
                 <p className="text-xs text-slate-600 mt-1 uppercase tracking-widest font-mono">
                   {s.label}
@@ -229,6 +193,17 @@ function LandingPage() {
             ))}
           </motion.div>
         </div>
+      </section>
+
+      {/* ── Product showcase ── */}
+      <section className="relative">
+        <p className="text-center text-xs font-mono text-slate-600 tracking-widest uppercase pt-20">
+          // Explore the platform
+        </p>
+        <h2 className="text-center text-3xl md:text-4xl font-semibold text-white tracking-tight mt-4">
+          Everything a dispute needs, in one flow
+        </h2>
+        <HeroParallax products={parallaxProducts} />
       </section>
 
       {/* ── Divider ── */}
@@ -393,38 +368,45 @@ function LandingPage() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-28 px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            {...fadeUp(0)}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-16 text-center relative overflow-hidden"
+      <section>
+        <LampContainer>
+          <motion.p
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.6, ease: "easeInOut" }}
+            className="text-xs font-mono text-slate-500 tracking-widest uppercase mb-6"
           >
-            {/* Subtle indigo glow */}
-            <div className="absolute inset-0 bg-indigo-600/[0.03] rounded-2xl" />
-
-            <div className="relative">
-              <p className="text-xs font-mono text-slate-600 tracking-widest uppercase mb-6">
-                // Get started
-              </p>
-              <h2 className="text-4xl md:text-5xl font-semibold text-white tracking-tight mb-4">
-                Ready to resolve disputes
-                <br />
-                <span className="text-slate-500">at scale?</span>
-              </h2>
-              <p className="text-slate-500 text-base mb-10 max-w-md mx-auto leading-relaxed">
-                Sign in with Google and raise your first dispute in under 60 seconds.
-              </p>
-              <motion.button
-                onClick={() => navigate("/login")}
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.97 }}
-                className="h-10 px-8 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
-              >
-                Get started — it's free
-              </motion.button>
-            </div>
-          </motion.div>
-        </div>
+            // Get started
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0.5, y: 100 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
+            className="bg-gradient-to-br from-slate-100 to-slate-500 py-4 bg-clip-text text-center text-4xl md:text-6xl font-semibold tracking-tight text-transparent"
+          >
+            Ready to resolve disputes
+            <br />at scale?
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6, ease: "easeInOut" }}
+            className="text-slate-500 text-base mt-6 mb-10 max-w-md mx-auto leading-relaxed text-center"
+          >
+            Sign in with Google and raise your first dispute in under 60 seconds.
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6, ease: "easeInOut" }}
+            onClick={() => navigate("/login")}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.97 }}
+            className="h-10 px-8 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+          >
+            Get started — it's free
+          </motion.button>
+        </LampContainer>
       </section>
 
       {/* ── Footer ── */}

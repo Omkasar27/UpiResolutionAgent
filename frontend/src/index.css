@@ -1,5 +1,49 @@
 @import "tailwindcss";
 
+/* This app is always dark — no light-mode toggle exists. Any pasted
+   component (shadcn/v0/etc.) that uses dark: variants should still work
+   correctly rather than silently falling back to prefers-color-scheme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  ── Theme ─────────────────────────────────────────────────────
+  Dark app shell using Tailwind's own default slate/emerald/amber/red
+  scales (unchanged), with the accent swapped from indigo to blue —
+  every existing `bg-indigo-600`, `text-indigo-400` class repaints
+  as blue automatically, no component markup changes needed.
+*/
+@theme {
+  /* Accent — replaces indigo with stock Tailwind blue. Buttons, links, focus. */
+  --color-indigo-50:  #eff6ff;
+  --color-indigo-100: #dbeafe;
+  --color-indigo-200: #bfdbfe;
+  --color-indigo-300: #93c5fd;
+  --color-indigo-400: #60a5fa;
+  --color-indigo-500: #3b82f6;
+  --color-indigo-600: #2563eb;
+  --color-indigo-700: #1d4ed8;
+  --color-indigo-800: #1e40af;
+  --color-indigo-900: #1e3a8a;
+  --color-indigo-950: #172554;
+
+  /* Type system: Instrument Sans for display, Public Sans for body,
+     IBM Plex Mono for ledger data (amounts, refs, timestamps, IDs). */
+  --font-sans:    "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+/* Headings carry the display face; everything else stays on Public Sans. */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-feature-settings: "ss01" 1;
+}
+
+/* Ledger data reads with tabular figures so amounts/columns align. */
+.font-mono {
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
 *,
 *::before,
 *::after {
@@ -9,20 +53,87 @@
 
 /* Selection */
 ::selection {
-  background-color: rgba(99, 102, 241, 0.3);
+  background-color: rgba(37, 99, 235, 0.35);
   color: white;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar         { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track   { background: transparent; }
-::-webkit-scrollbar-thumb   { background: #1e293b; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #334155; }
+::-webkit-scrollbar-thumb   { background: #363A59; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #484D74; }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline: 2px solid rgba(37, 99, 235, 0.65);
   outline-offset: 2px;
+}
+
+/* ── Signature: perforated receipt edge ──────────────────────
+   A row of die-cut holes, the way a payment slip tears from its
+   pad. Used sparingly, at section boundaries, to keep the "this
+   is a receipt" idea legible in the structure, not just the copy. */
+.receipt-edge {
+  position: relative;
+  border-bottom: none;
+}
+.receipt-edge::after {
+  content: "";
+  display: block;
+  height: 9px;
+  width: 100%;
+  background-image: radial-gradient(circle, var(--color-slate-950) 3.5px, transparent 3.6px);
+  background-size: 18px 9px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+.receipt-edge-top::before {
+  content: "";
+  display: block;
+  height: 9px;
+  width: 100%;
+  background-image: radial-gradient(circle, var(--color-slate-950) 3.5px, transparent 3.6px);
+  background-size: 18px 9px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+/* ── Shine-border focus ring ─────────────────────────────────
+   A thin rotating gold arc appears around inputs on focus —
+   the "seal" catching light, rather than a flat highlight. */
+@property --shine-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.shine-border {
+  position: relative;
+  border-radius: 0.5rem;
+}
+.shine-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--shine-angle), transparent 0%, var(--color-indigo-300) 12%, transparent 28%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  animation: shine-rotate 2.6s linear infinite;
+}
+.shine-border:focus-within::before {
+  opacity: 1;
+}
+@keyframes shine-rotate {
+  to { --shine-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shine-border::before { animation: none; }
 }
 
 /* Animations */

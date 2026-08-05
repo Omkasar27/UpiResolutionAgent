@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 640" width="800" height="640">
+  <defs>
+    <linearGradient id="bg7" x1="0" y1="0" x2="800" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <radialGradient id="glow7" cx="0.5" cy="0.15" r="0.6">
+      <stop offset="0" stop-color="#10b981" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#10b981" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="640" fill="url(#bg7)"/>
+  <rect width="800" height="640" fill="url(#glow7)"/>
+  <rect x="0.5" y="0.5" width="799" height="639" rx="16" fill="none" stroke="#1e293b"/>
+
+  <!-- fake window chrome -->
+  <circle cx="40" cy="40" r="6" fill="#334155"/>
+  <circle cx="60" cy="40" r="6" fill="#334155"/>
+  <circle cx="80" cy="40" r="6" fill="#334155"/>
+
+  <!-- icon badge -->
+  <rect x="64" y="90" width="72" height="72" rx="16" fill="#10b981" fill-opacity="0.14"/>
+  <g transform="translate(84,110) scale(1.25)" stroke="#10b981" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+  </g>
+
+  <!-- tag -->
+  <text x="64" y="205" font-family="IBM Plex Mono, monospace" font-size="15" letter-spacing="2" fill="#10b981" opacity="0.85">RESOLVED</text>
+
+  <!-- title -->
+  <text x="60" y="270" font-family="Instrument Sans, sans-serif" font-size="44" font-weight="600" fill="#f8fafc">Refund Issued</text>
+
+  <!-- fake UI rows -->
+  <rect x="64" y="420" width="79%" height="10" rx="5" fill="white" fill-opacity="0.1" /><rect x="64" y="454" width="72%" height="10" rx="5" fill="white" fill-opacity="0.08" /><rect x="64" y="488" width="65%" height="10" rx="5" fill="white" fill-opacity="0.060000000000000005" />
+</svg>

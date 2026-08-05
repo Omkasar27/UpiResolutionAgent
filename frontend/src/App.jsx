@@ -8,11 +8,13 @@ import CustomerPage from "./pages/CustomerPage"
 import AdminPage from "./pages/AdminPage"
 import NotFoundPage from "./pages/NotFoundPage"
 import ProtectedRoute from "./components/ProtectedRoute"
+import { CommandPalette } from "./components/CommandPalette"
 import "./index.css"
 
 function App() {
   return (
     <AuthProvider>
+      <CommandPalette />
       <Routes>
         {/* Public */}
         <Route path="/"      element={<LandingPage />} />
