@@ -62,6 +62,8 @@ h1, h2, h3 {
 ::-webkit-scrollbar-track   { background: transparent; }
 ::-webkit-scrollbar-thumb   { background: #363A59; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: #484D74; }
+::-webkit-scrollbar-thumb   { background: #363A59; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #484D74; }
 
 /* Focus ring */
 :focus-visible {
