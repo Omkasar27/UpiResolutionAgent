@@ -11,16 +11,16 @@ export function Button({
   type      = "button",
 }) {
   const variants = {
-    primary:   "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/10 border border-indigo-500/20",
+    primary:   "bg-slate-700 hover:bg-slate-600 text-white shadow-lg shadow-slate-950/30 border border-slate-600",
     secondary: "bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300",
     ghost:     "text-slate-500 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent",
     danger:    "text-red-400 hover:bg-red-400/10 border border-red-500/20",
   }
 
   const sizes = {
-    sm: "h-7  px-3   text-xs  rounded-md",
-    md: "h-9  px-4   text-sm  rounded-lg",
-    lg: "h-10 px-6   text-sm  rounded-lg",
+    sm: "min-h-11 px-3   text-xs  rounded-md",
+    md: "min-h-11 px-4   text-sm  rounded-lg",
+    lg: "min-h-11 px-6   text-sm  rounded-lg",
     xl: "h-12 px-8   text-base rounded-xl",
   }
 

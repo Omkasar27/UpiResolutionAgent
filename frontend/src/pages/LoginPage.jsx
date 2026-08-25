@@ -10,7 +10,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (user) navigate(user.role === "admin" ? "/admin" : "/customer")
-  }, [user])
+  }, [user, navigate])
 
   const handleLogin = () => {
     window.location.href = "http://127.0.0.1:5000/auth/login"
@@ -19,15 +19,6 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center px-8 pt-20 pb-8 relative overflow-hidden">
       <SiteNavbar />
-
-      {/* Ambient glow */}
-      <div className="absolute inset-0 -z-10 pointer-events-none motion-reduce:hidden" aria-hidden="true">
-        <motion.div
-          className="absolute left-1/2 top-1/3 w-[560px] h-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/[0.10] blur-[130px]"
-          animate={{ opacity: [0.5, 0.8, 0.5], scale: [1, 1.06, 1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </div>
 
       {/* ── Sign-in card ── */}
       <motion.div
@@ -59,7 +50,7 @@ function LoginPage() {
           >
             <motion.button
               onClick={handleLogin}
-              whileHover={{ y: -2, borderColor: "rgba(99,102,241,0.4)" }}
+              whileHover={{ y: -2, borderColor: "rgba(102,112,133,0.8)" }}
               whileTap={{ scale: 0.98 }}
               className="w-full h-10 flex items-center justify-center gap-3 bg-slate-900 border border-slate-800 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-colors duration-150"
             >

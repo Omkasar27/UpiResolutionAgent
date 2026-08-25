@@ -5,32 +5,119 @@
    correctly rather than silently falling back to prefers-color-scheme. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/*
-  ── Theme ─────────────────────────────────────────────────────
-  Dark app shell using Tailwind's own default slate/emerald/amber/red
-  scales (unchanged), with the accent swapped from indigo to blue —
-  every existing `bg-indigo-600`, `text-indigo-400` class repaints
-  as blue automatically, no component markup changes needed.
-*/
 @theme {
-  /* Accent — replaces indigo with stock Tailwind blue. Buttons, links, focus. */
-  --color-indigo-50:  #eff6ff;
-  --color-indigo-100: #dbeafe;
-  --color-indigo-200: #bfdbfe;
-  --color-indigo-300: #93c5fd;
-  --color-indigo-400: #60a5fa;
-  --color-indigo-500: #3b82f6;
-  --color-indigo-600: #2563eb;
-  --color-indigo-700: #1d4ed8;
-  --color-indigo-800: #1e40af;
-  --color-indigo-900: #1e3a8a;
-  --color-indigo-950: #172554;
+  --color-slate-950: #0A0E15;
+  --color-slate-900: #212631;
+  --color-slate-800: #373F4E;
+  --color-slate-700: #4E576A;
+  --color-slate-600: #667085;
+  --color-slate-500: #BFC6D4;
+  --color-slate-400: #D1D6E0;
+  --color-slate-300: #E0E4EB;
+  --color-slate-200: #F0F1F5;
+  --color-slate-100: #FFFFFF;
+  --color-slate-50: #FFFFFF;
+
+  --color-indigo-950: #0A0E15;
+  --color-indigo-900: #212631;
+  --color-indigo-800: #373F4E;
+  --color-indigo-700: #4E576A;
+  --color-indigo-600: #4E576A;
+  --color-indigo-500: #667085;
+  --color-indigo-400: #D1D6E0;
+  --color-indigo-300: #E0E4EB;
+  --color-indigo-200: #F0F1F5;
+  --color-indigo-100: #FFFFFF;
+  --color-indigo-50: #FFFFFF;
 
   /* Type system: Instrument Sans for display, Public Sans for body,
      IBM Plex Mono for ledger data (amounts, refs, timestamps, IDs). */
   --font-sans:    "Public Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+:root {
+  --color-background: #0A0E15;
+  --color-surface: #212631;
+  --color-surface-elevated: #373F4E;
+  --color-foreground: #FFFFFF;
+  --color-foreground-secondary: #F0F1F5;
+  --color-foreground-tertiary: #E0E4EB;
+  --color-foreground-muted: #D1D6E0;
+  --color-border: #373F4E;
+  --color-border-strong: #4E576A;
+  --color-primary: #4E576A;
+  --color-success: #4D9A75;
+  --color-warning: #B58A3D;
+  --color-destructive: #B85C5C;
+  --color-info: #6686A8;
+}
+
+.landing-canvas {
+  position: relative;
+  background-color: var(--color-background);
+  background-image:
+    linear-gradient(115deg, transparent 0 54%, rgb(255 255 255 / 0.035) 54.1%, transparent 54.25%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.018) 0 1px, transparent 1px 72px);
+}
+
+.resolution-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.landing-canvas > :not(.resolution-backdrop) {
+  position: relative;
+  z-index: 1;
+}
+
+.resolution-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: -25% -10%;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 88px 88px;
+  transform: perspective(700px) rotateX(58deg) translateY(-12%);
+  transform-origin: center top;
+  opacity: 0.3;
+  animation: grid-drift 22s linear infinite;
+}
+
+.resolution-backdrop::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(224 228 235 / 0.5), transparent);
+  box-shadow: 0 0 28px rgb(224 228 235 / 0.12);
+  animation: scanline 8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes grid-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 0 88px, 88px 0; }
+}
+
+@keyframes scanline {
+  from { transform: translateY(0); opacity: 0; }
+  12% { opacity: 0.75; }
+  70% { opacity: 0.35; }
+  to { transform: translateY(135vh); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resolution-backdrop::before,
+  .resolution-backdrop::after {
+    animation: none;
+  }
 }
 
 /* Headings carry the display face; everything else stays on Public Sans. */
@@ -53,21 +140,21 @@ h1, h2, h3 {
 
 /* Selection */
 ::selection {
-  background-color: rgba(37, 99, 235, 0.35);
-  color: white;
+  background-color: rgb(255 255 255 / 0.22);
+  color: #FFFFFF;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar         { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track   { background: transparent; }
-::-webkit-scrollbar-thumb   { background: #363A59; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #484D74; }
-::-webkit-scrollbar-thumb   { background: #363A59; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: #484D74; }
+::-webkit-scrollbar-thumb   { background: #4E576A; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #667085; }
+::-webkit-scrollbar-thumb   { background: #4E576A; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #667085; }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.65);
+  outline: 2px solid #D1D6E0;
   outline-offset: 2px;
 }
 
@@ -119,7 +206,7 @@ h1, h2, h3 {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: conic-gradient(from var(--shine-angle), transparent 0%, var(--color-indigo-300) 12%, transparent 28%);
+  background: conic-gradient(from var(--shine-angle), transparent 0%, #D1D6E0 12%, transparent 28%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

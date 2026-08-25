@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 
+const GRID_OPACITIES = [1, 0.2, 0.2, 1, 0.2, 1, 0.2, 0.2, 1, 0.2, 1, 0.2, 0.2, 1, 0.2, 0.2, 1, 0.2, 1, 0.2, 0.2, 1, 0.2, 1]
+
 function NotFoundPage() {
   const navigate = useNavigate()
 
@@ -40,7 +42,7 @@ function NotFoundPage() {
             onClick={() => navigate("/")}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
-            className="h-9 px-5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+            className="min-h-11 px-5 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-slate-950/30"
           >
             Back to home
           </motion.button>
@@ -65,7 +67,7 @@ function NotFoundPage() {
             <motion.div
               key={i}
               initial={{ opacity: 0 }}
-              animate={{ opacity: Math.random() > 0.5 ? 1 : 0.2 }}
+              animate={{ opacity: GRID_OPACITIES[i] }}
               transition={{ delay: 0.3 + i * 0.02 }}
               className="w-full aspect-square bg-slate-800 rounded-sm"
             />

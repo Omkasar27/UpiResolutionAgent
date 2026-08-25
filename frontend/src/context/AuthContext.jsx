@@ -1,31 +1,27 @@
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useCallback, useContext, useState } from "react"
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null)
-  const [token, setToken]     = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
+  const [auth] = useState(() => {
     try {
       const savedToken = localStorage.getItem("token")
       const savedUser  = localStorage.getItem("user")
 
       if (savedToken && savedUser) {
-        setToken(savedToken)
-        setUser(JSON.parse(savedUser))
+        return { token: savedToken, user: JSON.parse(savedUser) }
       }
     } catch (err) {
       console.error("Failed to load auth from storage:", err)
       localStorage.removeItem("token")
       localStorage.removeItem("user")
-    } finally {
-      setLoading(false)
     }
-  }, [])
+    return { token: null, user: null }
+  })
+  const [user, setUser] = useState(auth.user)
+  const [token, setToken] = useState(auth.token)
 
-  const login = (token, userData) => {
+  const login = useCallback((token, userData) => {
     try {
       localStorage.setItem("token", token)
       localStorage.setItem("user", JSON.stringify(userData))
@@ -36,9 +32,9 @@ export function AuthProvider({ children }) {
       console.error("Failed to save auth:", err)
       return false
     }
-  }
+  }, [])
 
-  const logout = () => {
+  const logout = useCallback(() => {
     try {
       localStorage.removeItem("token")
       localStorage.removeItem("user")
@@ -48,15 +44,17 @@ export function AuthProvider({ children }) {
       setToken(null)
       setUser(null)
     }
-  }
+  }, [])
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, loading: false }}>
       {children}
     </AuthContext.Provider>
   )
 }
 
+// The hook intentionally lives beside its context provider for a stable public API.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext)
 }

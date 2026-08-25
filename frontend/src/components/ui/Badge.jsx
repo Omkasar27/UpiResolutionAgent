@@ -2,7 +2,7 @@ const statusStyles = {
   RESOLVED:  "text-emerald-400 bg-emerald-400/10 border-emerald-500/20",
   PENDING:   "text-amber-400   bg-amber-400/10   border-amber-500/20",
   ESCALATED: "text-red-400     bg-red-400/10     border-red-500/20",
-  OPEN:      "text-indigo-400  bg-indigo-400/10  border-indigo-500/20",
+  OPEN:      "text-slate-300   bg-slate-300/10   border-slate-500/20",
   default:   "text-slate-400   bg-slate-400/10   border-slate-500/20",
 }
 

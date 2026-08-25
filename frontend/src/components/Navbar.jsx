@@ -43,7 +43,7 @@ function Navbar({ onMenuClick }) {
           <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
           <span className="text-xs text-slate-500 font-mono">{user?.role}</span>
         </div>
-        <div className="w-7 h-7 bg-indigo-600/20 border border-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 text-xs font-bold">
+        <div className="w-7 h-7 bg-slate-800 border border-slate-600 rounded-full flex items-center justify-center text-slate-200 text-xs font-bold">
           {user?.name?.charAt(0).toUpperCase()}
         </div>
       </div>

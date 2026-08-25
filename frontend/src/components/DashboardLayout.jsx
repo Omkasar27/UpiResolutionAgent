@@ -9,7 +9,7 @@ function DashboardLayout({ children }) {
     <div className="min-h-screen bg-slate-950 text-white">
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/70 z-30 lg:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-slate-950/80 z-30 lg:hidden backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}

@@ -20,7 +20,7 @@ export function StatCard({
       className={`
         text-left w-full p-4 rounded-xl border transition-all duration-200
         ${active
-          ? "bg-slate-800 border-indigo-500/30 shadow-lg shadow-indigo-500/5"
+          ? "bg-slate-800 border-slate-500/50 shadow-lg shadow-slate-950/30"
           : "bg-slate-900 border-slate-800 hover:border-slate-700 hover:bg-slate-800/50"
         }
       `}
@@ -45,7 +45,7 @@ export function StatCard({
       {active && (
         <motion.div
           layoutId="stat-indicator"
-          className="mt-3 h-px bg-indigo-500/50 rounded-full"
+          className="mt-3 h-px bg-slate-400/70 rounded-full"
         />
       )}
     </motion.button>

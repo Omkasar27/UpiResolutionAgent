@@ -25,6 +25,7 @@ export function CommandPalette() {
   const [query, setQuery] = useState("")
   const [active, setActive] = useState(0)
   const inputRef = useRef(null)
+  const launcherRef = useRef(null)
 
   const { user, logout } = useAuth()
   const navigate = useNavigate()
@@ -69,8 +70,38 @@ export function CommandPalette() {
     setQuery("")
     setActive(0)
     setOpen(true)
-    setTimeout(() => inputRef.current?.focus(), 10)
   }
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousFocus = document.activeElement
+    inputRef.current?.focus()
+
+    const onDialogKeyDown = (e) => {
+      if (e.key !== "Tab") return
+      const dialog = e.currentTarget
+      const focusable = [...dialog.querySelectorAll("button, input")]
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    const dialog = document.getElementById("command-palette-dialog")
+    dialog?.addEventListener("keydown", onDialogKeyDown)
+
+    return () => {
+      dialog?.removeEventListener("keydown", onDialogKeyDown)
+      if (previousFocus instanceof HTMLElement) previousFocus.focus()
+    }
+  }, [open])
 
   // Global open/close shortcut
   useEffect(() => {
@@ -101,7 +132,11 @@ export function CommandPalette() {
     <>
       {/* Launcher hint, bottom-right, desktop only */}
       <button
+        ref={launcherRef}
         onClick={openPalette}
+        aria-label="Open quick actions"
+        aria-haspopup="dialog"
+        aria-controls="command-palette-dialog"
         className="hidden md:flex fixed bottom-5 right-5 z-40 items-center gap-2 h-8 px-3 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-lg text-xs text-slate-500 hover:text-slate-300 hover:border-slate-700 transition-colors duration-150 shadow-lg"
       >
         <Icon d={ICONS.search} />
@@ -123,6 +158,7 @@ export function CommandPalette() {
               className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-[60]"
             />
             <motion.div
+              id="command-palette-dialog"
               role="dialog"
               aria-modal="true"
               aria-label="Command palette"
@@ -161,11 +197,11 @@ export function CommandPalette() {
                       onMouseEnter={() => setActive(i)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-left transition-colors duration-100 ${
                         i === active
-                          ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20"
+                          ? "bg-slate-700/50 text-slate-100 border border-slate-500"
                           : "text-slate-400 border border-transparent"
                       }`}
                     >
-                      <span className={i === active ? "text-indigo-400" : "text-slate-600"}>
+                      <span className={i === active ? "text-slate-100" : "text-slate-500"}>
                         <Icon d={item.icon} />
                       </span>
                       <span className="flex-1 font-medium">{item.label}</span>

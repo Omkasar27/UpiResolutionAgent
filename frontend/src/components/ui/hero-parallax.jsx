@@ -59,6 +59,8 @@ export const ProductCard = ({ product, translate }) => {
           src={product.thumbnail}
           height="640"
           width="800"
+          loading="lazy"
+          decoding="async"
           className="object-cover object-left-top absolute h-full w-full inset-0 rounded-xl border border-slate-800"
           alt={product.title}
         />

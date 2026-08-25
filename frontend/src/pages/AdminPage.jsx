@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import api from "../api/axios"
-import { useAuth } from "../context/AuthContext"
-import { Card, CardHeader, CardBody } from "../components/ui/Card"
+import { Card, CardHeader } from "../components/ui/Card"
 import { Button } from "../components/ui/Button"
 import { StatusBadge, ActionBadge } from "../components/ui/Badge"
 import { PageHeader } from "../components/ui/PageHeader"
@@ -21,31 +20,39 @@ const stagger = {
 }
 
 function AdminPage() {
-  const { user }                    = useAuth()
   const [disputes, setDisputes]     = useState([])
   const [loading, setLoading]       = useState(true)
+  const [fetchError, setFetchError] = useState(null)
   const [overriding, setOverriding] = useState(null)
   const [filter, setFilter]         = useState("ALL")
   const [search, setSearch]         = useState("")
   const [selected, setSelected]     = useState(null)
 
-  useEffect(() => {
-    fetchDisputes()
-    const interval = setInterval(fetchDisputes, 15000)
-    return () => clearInterval(interval)
-  }, [])
-
-  const fetchDisputes = async () => {
+  const fetchDisputes = useCallback(async (signal) => {
     setLoading(true)
     try {
-      const res = await api.get("/admin/disputes")
+      const res = await api.get("/admin/disputes", { signal })
       setDisputes(res.data.disputes)
-    } catch {
-      console.error("Failed to fetch.")
+      setFetchError(null)
+    } catch (err) {
+      if (err.name !== "CanceledError" && err.code !== "ERR_CANCELED") {
+        setFetchError("Could not load disputes. Try again.")
+      }
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const initialRequest = setTimeout(() => fetchDisputes(controller.signal), 0)
+    const interval = setInterval(() => fetchDisputes(), 15000)
+    return () => {
+      clearTimeout(initialRequest)
+      controller.abort()
+      clearInterval(interval)
+    }
+  }, [fetchDisputes])
 
   const handleOverride = async (dispute_id, action) => {
     setOverriding(`${dispute_id}-${action}`)
@@ -108,12 +115,21 @@ function AdminPage() {
           title="Overview"
           description="Manage and resolve all customer disputes across the platform."
           action={
-            <Button variant="secondary" size="sm" onClick={fetchDisputes}>
+            <Button variant="secondary" size="sm" onClick={() => fetchDisputes()}>
               Refresh
             </Button>
           }
         />
       </motion.div>
+
+      {fetchError && (
+        <motion.div variants={fadeUp} role="alert" className="flex items-center justify-between gap-4 p-3 bg-red-500/5 border border-red-500/20 rounded-lg">
+          <p className="text-sm text-red-400">{fetchError}</p>
+          <Button variant="secondary" size="sm" onClick={() => fetchDisputes()}>
+            Retry
+          </Button>
+        </motion.div>
+      )}
 
       {/* ── Stats ── */}
       <motion.div
@@ -171,7 +187,7 @@ function AdminPage() {
                   placeholder="Search disputes..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="h-8 px-3 bg-slate-800/50 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all font-mono w-full sm:w-52"
+                  className="h-8 px-3 bg-slate-800/50 border border-slate-700 rounded-lg text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/30 transition-all font-mono w-full sm:w-52"
                 />
               </div>
             </CardHeader>
@@ -222,11 +238,19 @@ function AdminPage() {
                           onClick={() => setSelected(
                             selected?.dispute_id === d.dispute_id ? null : d
                           )}
+                          onKeyDown={e => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault()
+                              setSelected(selected?.dispute_id === d.dispute_id ? null : d)
+                            }
+                          }}
+                          tabIndex={0}
+                          aria-label={`View dispute ${d.dispute_id}`}
                           className={`
                             border-b border-slate-800/50 cursor-pointer
                             transition-colors duration-150
                             ${selected?.dispute_id === d.dispute_id
-                              ? "bg-indigo-500/5 border-l-2 border-l-indigo-500"
+                              ? "bg-slate-700/30 border-l-2 border-l-slate-400"
                               : "hover:bg-slate-800/30"
                             }
                             ${i === filtered.length - 1 ? "border-b-0" : ""}
@@ -388,9 +412,10 @@ function AdminPage() {
                       </div>
                       <div className="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
                         <motion.div
-                          className="h-1 rounded-full bg-indigo-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.round(selected.ai_confidence * 100)}%` }}
+                          className="h-1 w-full origin-left rounded-full bg-slate-400"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: Math.round(selected.ai_confidence * 100) / 100 }}
+                          style={{ originX: 0 }}
                           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
                         />
                       </div>

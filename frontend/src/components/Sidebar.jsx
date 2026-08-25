@@ -41,7 +41,7 @@ function Sidebar({ onClose }) {
       {/* Logo */}
       <div className="px-5 h-14 flex items-center justify-between border-b border-slate-800">
         <a href="/" className="flex items-center gap-2.5">
-          <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center">
+          <div className="w-6 h-6 bg-slate-700 rounded-md flex items-center justify-center">
             <span className="text-white text-xs font-bold">U</span>
           </div>
           <span className="text-sm font-semibold text-white tracking-tight">
@@ -73,17 +73,17 @@ function Sidebar({ onClose }) {
               className={`
                 w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150
                 ${isActive
-                  ? "bg-indigo-600/10 text-indigo-400 border border-indigo-500/20"
+                  ? "bg-slate-700/50 text-slate-100 border border-slate-500"
                   : "text-slate-500 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
                 }
               `}
             >
-              <span className={isActive ? "text-indigo-400" : "text-slate-600"}>
+              <span className={isActive ? "text-slate-100" : "text-slate-500"}>
                 {link.icon}
               </span>
               <span className="font-medium">{link.label}</span>
               {isActive && (
-                <div className="ml-auto w-1 h-1 bg-indigo-400 rounded-full" />
+                <div className="ml-auto w-1 h-1 bg-slate-200 rounded-full" />
               )}
             </motion.button>
           )
@@ -93,7 +93,7 @@ function Sidebar({ onClose }) {
       {/* User */}
       <div className="border-t border-slate-800 p-3 space-y-1">
         <div className="flex items-center gap-3 px-2 py-2">
-          <div className="w-7 h-7 bg-indigo-600/20 border border-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 text-xs font-bold flex-shrink-0">
+          <div className="w-7 h-7 bg-slate-800 border border-slate-600 rounded-full flex items-center justify-center text-slate-200 text-xs font-bold flex-shrink-0">
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div className="overflow-hidden flex-1 min-w-0">

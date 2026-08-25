@@ -45,7 +45,7 @@ function AuthPage() {
       navigate(destination, { replace: true })
     }, 800)
 
-  }, [])
+  }, [login, navigate])
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center">
@@ -59,7 +59,7 @@ function AuthPage() {
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-indigo-500/20"
+          className="w-10 h-10 bg-slate-700 rounded-xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-slate-950/30"
         >
           <span className="text-white text-sm font-bold">U</span>
         </motion.div>
@@ -81,7 +81,7 @@ function AuthPage() {
 
         <motion.div className="mt-8 w-48 h-px bg-slate-800 rounded-full mx-auto overflow-hidden">
           <motion.div
-            className="h-px bg-indigo-500 rounded-full"
+            className="h-px bg-slate-400 rounded-full"
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: 0.8, ease: "easeInOut" }}

@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import api from "../api/axios"
-import { useAuth } from "../context/AuthContext"
 import { Card, CardHeader, CardBody } from "../components/ui/Card"
 import { Button } from "../components/ui/Button"
 import { Input, Textarea } from "../components/ui/Input"
@@ -21,28 +20,37 @@ const stagger = {
 }
 
 function CustomerPage() {
-  const { user } = useAuth()
-
   const [form, setForm]               = useState({ transaction_id: "", description: "" })
   const [loading, setLoading]         = useState(false)
   const [error, setError]             = useState(null)
   const [result, setResult]           = useState(null)
   const [myDisputes, setMyDisputes]   = useState([])
   const [loadingList, setLoadingList] = useState(true)
+  const [listError, setListError]     = useState(null)
 
-  useEffect(() => { fetchMyDisputes() }, [])
-
-  const fetchMyDisputes = async () => {
+  const fetchMyDisputes = useCallback(async (signal) => {
     setLoadingList(true)
     try {
-      const res = await api.get("/disputes/my")
+      const res = await api.get("/disputes/my", { signal })
       setMyDisputes(res.data.disputes)
-    } catch {
-      console.error("Failed to load.")
+      setListError(null)
+    } catch (err) {
+      if (err.name !== "CanceledError" && err.code !== "ERR_CANCELED") {
+        setListError("Could not load your disputes. Try again.")
+      }
     } finally {
       setLoadingList(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const initialRequest = setTimeout(() => fetchMyDisputes(controller.signal), 0)
+    return () => {
+      clearTimeout(initialRequest)
+      controller.abort()
+    }
+  }, [fetchMyDisputes])
 
   const handleSubmit = async () => {
     if (!form.transaction_id.trim()) {
@@ -116,7 +124,7 @@ function CustomerPage() {
                       className={`
                         h-7 px-3 rounded-md text-xs font-mono transition-all duration-150 border
                         ${form.transaction_id === id
-                          ? "bg-indigo-600/20 text-indigo-400 border-indigo-500/40"
+                          ? "bg-slate-700/50 text-slate-100 border-slate-500"
                           : "text-slate-600 border-slate-800 hover:border-slate-700 hover:text-slate-400 bg-slate-900"
                         }
                       `}
@@ -249,9 +257,10 @@ function CustomerPage() {
                       </div>
                       <div className="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
                         <motion.div
-                          className="h-1 rounded-full bg-indigo-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${Math.round(result.ai_confidence * 100)}%` }}
+                          className="h-1 w-full origin-left rounded-full bg-slate-400"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: Math.round(result.ai_confidence * 100) / 100 }}
+                          style={{ originX: 0 }}
                           transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
                         />
                       </div>
@@ -344,7 +353,14 @@ function CustomerPage() {
         </div>
 
         <Card animate={false}>
-          {loadingList ? (
+          {listError ? (
+            <div className="flex items-center justify-between gap-4 p-10">
+              <p role="alert" className="text-sm text-red-400">{listError}</p>
+              <Button variant="secondary" size="sm" onClick={() => fetchMyDisputes()}>
+                Retry
+              </Button>
+            </div>
+          ) : loadingList ? (
             <div className="p-10 text-center">
               <p className="text-xs font-mono text-slate-700">Loading...</p>
             </div>

@@ -38,7 +38,6 @@ export const NavBody = ({ children, className, visible }) => {
         y: visible ? 8 : 0,
       }}
       transition={{ type: "spring", stiffness: 200, damping: 50 }}
-      style={{ minWidth: "800px" }}
       className={cn(
         "relative z-40 mx-auto hidden w-full max-w-7xl flex-row items-center justify-between self-start rounded-full bg-transparent px-4 py-2 lg:flex",
         visible && "bg-slate-900/80 border border-slate-800",
@@ -122,6 +121,8 @@ export const MobileNavMenu = ({ children, className, isOpen }) => {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
+          id="mobile-navigation-menu"
+          role="menu"
           className={cn(
             "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-xl bg-slate-900 border border-slate-800 px-4 py-8 shadow-2xl",
             className
@@ -135,17 +136,24 @@ export const MobileNavMenu = ({ children, className, isOpen }) => {
 }
 
 export const MobileNavToggle = ({ isOpen, onClick }) => {
-  return isOpen ? (
-    <X className="text-white" onClick={onClick} />
-  ) : (
-    <Menu className="text-white" onClick={onClick} />
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+      aria-expanded={isOpen}
+      aria-controls="mobile-navigation-menu"
+      className="flex h-11 w-11 items-center justify-center text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
+    >
+      {isOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+    </button>
   )
 }
 
 export const NavbarLogo = () => {
   return (
     <a href="/" className="relative z-20 mr-4 flex items-center gap-2 px-2 py-1 text-sm font-normal">
-      <div className="w-6 h-6 bg-indigo-600 rounded-md flex items-center justify-center shrink-0">
+      <div className="w-6 h-6 bg-slate-700 rounded-md flex items-center justify-center shrink-0">
         <span className="text-white text-xs font-bold">U</span>
       </div>
       <span className="font-medium text-white">UPI Dispute</span>
@@ -165,10 +173,10 @@ export const NavbarButton = ({
     "px-4 py-2 rounded-md text-sm font-medium relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center"
 
   const variantStyles = {
-    primary:   "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20",
+    primary:   "bg-slate-700 hover:bg-slate-600 text-white shadow-lg shadow-slate-950/30",
     secondary: "bg-transparent text-slate-300 hover:text-white shadow-none",
     dark:      "bg-slate-800 text-white border border-slate-700",
-    gradient:  "bg-gradient-to-b from-indigo-500 to-indigo-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.15)_inset]",
+    gradient:  "bg-slate-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.15)_inset]",
   }
 
   return (

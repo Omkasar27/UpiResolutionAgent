@@ -25,7 +25,7 @@ export function Card({
       transition={{ duration: 0.25, ease: "easeOut" }}
       whileHover={hover ? {
         y: -3,
-        borderColor: "rgba(99,102,241,0.25)",
+        borderColor: "rgba(102,112,133,0.7)",
         boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
       } : {}}
     >

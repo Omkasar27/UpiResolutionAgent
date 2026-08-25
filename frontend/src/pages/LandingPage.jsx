@@ -1,39 +1,47 @@
+import { lazy, Suspense, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { NumberTicker } from "../components/ui/NumberTicker"
-import { LampContainer } from "../components/ui/lamp"
-import { HeroParallax } from "../components/ui/hero-parallax"
 import { parallaxProducts } from "../data/parallaxProducts"
 import { SiteNavbar } from "../components/SiteNavbar"
+
+const HeroParallax = lazy(() => import("../components/ui/hero-parallax").then(module => ({ default: module.HeroParallax })))
+const LampContainer = lazy(() => import("../components/ui/lamp").then(module => ({ default: module.LampContainer })))
 
 const FEATURES = [
   {
     tag:   "AI AGENT",
+    accent: "indigo",
     title: "Intelligent Decision Engine",
     desc:  "Every dispute is analyzed by an AI agent that cross-references bank records and merchant data to produce a deterministic resolution."
   },
   {
     tag:   "VERIFICATION",
+    accent: "emerald",
     title: "Dual-Source Verification",
     desc:  "We query both the bank and merchant independently. Conflicting signals are automatically flagged for escalation."
   },
   {
     tag:   "AUDIT",
+    accent: "amber",
     title: "Full Audit Trail",
     desc:  "Every action — dispute creation, AI decision, admin override — is logged with timestamp and actor."
   },
   {
     tag:   "ACCESS CONTROL",
+    accent: "indigo",
     title: "Role-Based Access",
     desc:  "Customers see only their own disputes. Admins get a unified view with override controls enforced at the API layer."
   },
   {
     tag:   "RESOLUTION",
+    accent: "emerald",
     title: "Automated Refund Flow",
     desc:  "When the AI determines a refund is warranted, the refund record is created instantly with no manual intervention."
   },
   {
     tag:   "DASHBOARD",
+    accent: "amber",
     title: "Admin Operations Center",
     desc:  "A structured table view of all disputes with search, filter by status, and per-row override controls."
   }
@@ -64,6 +72,12 @@ const STATS = [
   { value: "JWT",   label: "Auth standard"   },
 ]
 
+const FEATURE_ACCENTS = {
+  indigo: "bg-slate-300",
+  emerald: "bg-emerald-400",
+  amber: "bg-amber-300",
+}
+
 const fadeUp = (delay = 0) => ({
   initial:    { opacity: 0, y: 16 },
   whileInView:{ opacity: 1, y: 0  },
@@ -71,128 +85,137 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.4, ease: "easeOut", delay }
 })
 
-const fadeIn = (delay = 0) => ({
-  initial:    { opacity: 0 },
-  whileInView:{ opacity: 1 },
-  viewport:   { once: true },
-  transition: { duration: 0.4, ease: "easeOut", delay }
-})
-
 function LandingPage() {
   const navigate = useNavigate()
+  const shouldReduceMotion = useReducedMotion()
+  const [activeFeature, setActiveFeature] = useState(0)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
+    <div className="landing-canvas min-h-screen text-white">
+      <div className="resolution-backdrop" aria-hidden="true" />
 
       {/* ── Navbar ── */}
       <SiteNavbar />
 
       {/* ── Hero ── */}
-      <section className="relative pt-40 pb-32 px-6 overflow-hidden">
-
-        {/* Ambient glow — a resolution seal warming up behind the headline */}
-        <div className="absolute inset-0 -z-10 pointer-events-none motion-reduce:hidden" aria-hidden="true">
-          <motion.div
-            className="absolute left-1/2 top-0 w-[640px] h-[640px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-indigo-600/[0.14] blur-[130px]"
-            animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute right-[15%] top-32 w-[360px] h-[360px] rounded-full bg-emerald-500/[0.06] blur-[110px]"
-            animate={{ opacity: [0.4, 0.7, 0.4] }}
-            transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-          />
+      <section className="relative px-6 pb-24 pt-32 lg:pt-40 overflow-hidden">
+        <div className="absolute inset-0 -z-10 pointer-events-none opacity-40" aria-hidden="true">
+          <div className="absolute inset-x-0 top-0 h-px bg-slate-600/70" />
+          <div className="absolute right-0 top-0 h-full w-1/2 bg-[linear-gradient(to_right,transparent_0%,rgba(255,255,255,0.025)_100%)]" />
         </div>
 
-        <div className="max-w-4xl mx-auto">
-
-          {/* Label */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="inline-flex items-center gap-2 mb-8"
-          >
-            <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
-            <span className="text-xs text-slate-500 font-mono tracking-widest uppercase">
-              AI-Powered Resolution Platform
-            </span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] mb-6"
-          >
-            UPI dispute resolution,
-            <br />
-            <span className="text-slate-500">decided by AI.</span>
-          </motion.h1>
-
-          {/* Sub */}
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="text-lg text-slate-500 leading-relaxed max-w-xl mb-10"
-          >
-            A structured mediation layer between customers, merchants, and banks.
-            Every dispute is verified, analyzed, and resolved — automatically.
-          </motion.p>
-
-          {/* CTA row */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="flex items-center gap-4"
-          >
-            <motion.button
-              onClick={() => navigate("/login")}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              className="h-10 px-6 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+        <div className="max-w-6xl mx-auto grid gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.35, delay: 0.1 }}
+              className="flex items-center gap-3 mb-8"
             >
-              Raise a dispute
-            </motion.button>
-            <motion.a
-              href="#how"
-              whileHover={{ y: -2 }}
-              className="h-10 px-6 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white text-sm font-medium rounded-lg transition-all duration-150 flex items-center"
-            >
-              How it works
-            </motion.a>
-          </motion.div>
+              <span className="h-px w-10 bg-amber-400" />
+              <span className="text-xs text-amber-300 font-mono tracking-widest uppercase">
+                Resolution infrastructure / 01
+              </span>
+            </motion.div>
 
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-wrap gap-10 mt-20 pt-10 border-t border-slate-800"
-          >
-            {STATS.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + i * 0.07 }}
+            <motion.h1
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, delay: 0.15 }}
+              className="max-w-3xl text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.02] mb-7"
+            >
+              Every dispute leaves a clear record.
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.22 }}
+              className="max-w-xl text-lg text-slate-400 leading-relaxed mb-10"
+            >
+              UPI disputes move through one accountable flow: bank evidence,
+              merchant evidence, an AI decision, and a resolution your team can audit.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.28 }}
+              className="flex flex-wrap items-center gap-4"
+            >
+              <motion.button
+                onClick={() => navigate("/login")}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                className="min-h-11 px-6 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-slate-950/30"
               >
-                <p className="text-2xl font-semibold text-white font-mono">
-                  {s.numeric != null
-                    ? <NumberTicker value={s.numeric} suffix={s.suffix} delay={400 + i * 70} />
-                    : s.value
-                  }
-                </p>
-                <p className="text-xs text-slate-600 mt-1 uppercase tracking-widest font-mono">
-                  {s.label}
-                </p>
-              </motion.div>
-            ))}
+                Raise a dispute
+              </motion.button>
+              <motion.a
+                href="#how"
+                whileHover={{ y: -2 }}
+                className="min-h-11 px-6 border border-slate-700 hover:border-slate-500 text-slate-300 hover:text-white text-sm font-medium rounded-lg transition-all duration-150 flex items-center"
+              >
+                See the flow
+              </motion.a>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18, rotate: 1 }}
+            animate={{ opacity: 1, y: 0, rotate: 0 }}
+            transition={{ duration: 0.55, delay: 0.25, ease: "easeOut" }}
+            className="relative mx-auto w-full max-w-lg border border-slate-700 bg-slate-900/90 p-5 shadow-2xl shadow-slate-950/60"
+          >
+            <div className="flex items-start justify-between border-b border-slate-700 pb-5">
+              <div>
+                <p className="text-[10px] font-mono text-slate-500 tracking-[0.2em] uppercase">Resolution record</p>
+                <p className="mt-2 font-mono text-sm text-slate-200">#DSP-2048 / TXN001</p>
+              </div>
+              <span className="border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-[10px] font-mono text-emerald-300 uppercase tracking-widest">Verified</span>
+            </div>
+            <div className="space-y-4 py-6 font-mono text-xs">
+              {[
+                ["Bank signal", "Captured", "text-emerald-300"],
+                ["Merchant signal", "Captured", "text-emerald-300"],
+                ["Decision", "Refund candidate", "text-amber-300"],
+                ["Confidence", "99.0%", "text-slate-100"],
+              ].map(([label, value, valueClass]) => (
+                <motion.div
+                  key={label}
+                  initial={shouldReduceMotion ? false : { opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.28, delay: shouldReduceMotion ? 0 : 0.42 + 0.08 * ["Bank signal", "Merchant signal", "Decision", "Confidence"].indexOf(label) }}
+                  className="flex items-center justify-between gap-4"
+                >
+                  <span className="text-slate-500">{label}</span>
+                  <span className={valueClass}>{value}</span>
+                </motion.div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between border-t border-dashed border-slate-700 pt-5">
+              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Next action</span>
+              <span className="text-sm font-medium text-white">Refund initiated</span>
+            </div>
+            <div className="absolute -bottom-3 left-6 bg-amber-400 px-3 py-1 text-[10px] font-mono font-bold text-slate-950 uppercase tracking-widest">AI decision / sealed</div>
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="max-w-6xl mx-auto mt-24 grid grid-cols-2 gap-6 border-t border-slate-800 pt-8 md:grid-cols-4 md:gap-10"
+        >
+          {STATS.map((s, i) => (
+            <div key={s.label}>
+              <p className="text-2xl font-semibold text-white font-mono">
+                {s.numeric != null ? <NumberTicker value={s.numeric} suffix={s.suffix} delay={400 + i * 70} /> : s.value}
+              </p>
+              <p className="text-xs text-slate-500 mt-1 uppercase tracking-widest font-mono">{s.label}</p>
+            </div>
+          ))}
+        </motion.div>
       </section>
 
       {/* ── Product showcase ── */}
@@ -203,7 +226,9 @@ function LandingPage() {
         <h2 className="text-center text-3xl md:text-4xl font-semibold text-white tracking-tight mt-4">
           Everything a dispute needs, in one flow
         </h2>
-        <HeroParallax products={parallaxProducts} />
+        <Suspense fallback={<div className="h-64" aria-hidden="true" />}>
+          <HeroParallax products={parallaxProducts} />
+        </Suspense>
       </section>
 
       {/* ── Divider ── */}
@@ -233,10 +258,29 @@ function LandingPage() {
               <motion.div
                 key={f.title}
                 {...fadeUp(i * 0.07)}
-                whileHover={{ y: -3, borderColor: "rgba(99,102,241,0.25)" }}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-6 cursor-default transition-colors duration-200"
+                whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+                whileFocus={shouldReduceMotion ? undefined : { y: -3 }}
+                onClick={() => setActiveFeature(i)}
+                onKeyDown={e => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault()
+                    setActiveFeature(i)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-pressed={activeFeature === i}
+                className={`relative bg-slate-900 border rounded-xl p-6 text-left cursor-pointer transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-300 ${activeFeature === i ? "border-slate-500 bg-slate-800/80" : "border-slate-800 hover:border-slate-600"}`}
               >
-                <p className="text-[10px] font-mono text-slate-600 tracking-widest mb-4 uppercase">
+                <motion.span
+                  aria-hidden="true"
+                  initial={false}
+                  animate={{ scaleX: activeFeature === i ? 1 : 0 }}
+                  transition={{ duration: shouldReduceMotion ? 0 : 0.2, ease: "easeOut" }}
+                  className={`absolute inset-x-6 top-0 h-0.5 origin-left ${FEATURE_ACCENTS[f.accent]}`}
+                />
+                <p className="flex items-center gap-2 text-[10px] font-mono text-slate-400 tracking-widest mb-4 uppercase">
+                  <span className={`h-1.5 w-1.5 rounded-full ${FEATURE_ACCENTS[f.accent]}`} aria-hidden="true" />
                   {f.tag}
                 </p>
                 <h3 className="text-sm font-semibold text-white mb-3">
@@ -248,6 +292,21 @@ function LandingPage() {
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            key={FEATURES[activeFeature].title}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.22, ease: "easeOut" }}
+            className="mt-5 flex flex-col gap-3 border-l-2 border-slate-500 bg-slate-900/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+            aria-live="polite"
+          >
+            <div>
+              <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Selected capability</p>
+              <p className="mt-1 text-sm font-medium text-slate-100">{FEATURES[activeFeature].title}</p>
+            </div>
+            <p className="max-w-xl text-sm text-slate-400">{FEATURES[activeFeature].desc}</p>
+          </motion.div>
         </div>
       </section>
 
@@ -317,7 +376,7 @@ function LandingPage() {
                 onClick={() => navigate("/login")}
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="h-10 px-6 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+                className="min-h-11 px-6 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-slate-950/30"
               >
                 Get started
               </motion.button>
@@ -337,7 +396,7 @@ function LandingPage() {
               <div className="space-y-1 text-xs leading-relaxed">
                 <p className="text-slate-600"># Google OAuth callback</p>
                 <p>
-                  <span className="text-indigo-400">user</span>
+                  <span className="text-slate-200">user</span>
                   <span className="text-slate-500"> = </span>
                   <span className="text-slate-300">get_or_create_user</span>
                   <span className="text-slate-500">(</span>
@@ -347,7 +406,7 @@ function LandingPage() {
                 </p>
                 <p className="text-slate-500">)</p>
                 <p className="mt-3">
-                  <span className="text-indigo-400">token</span>
+                  <span className="text-slate-200">token</span>
                   <span className="text-slate-500"> = </span>
                   <span className="text-slate-300">create_access_token</span>
                   <span className="text-slate-500">(</span>
@@ -369,7 +428,8 @@ function LandingPage() {
 
       {/* ── CTA ── */}
       <section>
-        <LampContainer>
+        <Suspense fallback={<div className="h-64" aria-hidden="true" />}>
+          <LampContainer>
           <motion.p
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -382,7 +442,7 @@ function LandingPage() {
             initial={{ opacity: 0.5, y: 100 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-            className="bg-gradient-to-br from-slate-100 to-slate-500 py-4 bg-clip-text text-center text-4xl md:text-6xl font-semibold tracking-tight text-transparent"
+            className="py-4 text-center text-4xl md:text-6xl font-semibold tracking-tight text-slate-100"
           >
             Ready to resolve disputes
             <br />at scale?
@@ -402,18 +462,19 @@ function LandingPage() {
             onClick={() => navigate("/login")}
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.97 }}
-            className="h-10 px-8 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20"
+            className="min-h-11 px-8 bg-slate-700 hover:bg-slate-600 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-slate-950/30"
           >
             Get started — it's free
           </motion.button>
-        </LampContainer>
+          </LampContainer>
+        </Suspense>
       </section>
 
       {/* ── Footer ── */}
       <footer className="border-t border-slate-800 py-8 px-6">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 bg-indigo-600 rounded-md flex items-center justify-center">
+            <div className="w-5 h-5 bg-slate-700 rounded-md flex items-center justify-center">
               <span className="text-white text-[10px] font-bold">U</span>
             </div>
             <span className="text-xs text-slate-600">UPI Dispute Platform</span>
